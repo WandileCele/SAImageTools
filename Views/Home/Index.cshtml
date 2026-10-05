@@ -1,0 +1,374 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compress Image to 200KB - Free Image Compressor & Image to PDF - SA Tools</title>
+    <meta name="description" content="Free image compressor to 200KB, 100KB. Compress, resize, convert image to PDF online. No upload to server, 100% private. Works offline. Best for NSFAS, job applications." />
+    <meta name="keywords" content="compress image to 200kb, image compressor, image to pdf, resize image, jpg to pdf, compress image South Africa" />
+    <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif;
+                background: #ffffff;
+                color: #111;
+                line-height: 1.5;
+            }
+
+            .header {
+                max-width: 760px;
+                margin: 0 auto;
+                padding: 24px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .logo {
+                font-weight: 700;
+                font-size: 18px;
+                letter-spacing: -0.5px;
+            }
+
+            .badge {
+                font-size: 11px;
+                background: #f5f5f5;
+                padding: 4px 8px;
+                border-radius: 20px;
+            }
+
+            .container {
+                max-width: 760px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .hero {
+                text-align: center;
+                margin: 40px 0 32px;
+            }
+
+                .hero h1 {
+                    font-size: 48px;
+                    font-weight: 800;
+                    letter-spacing: -2px;
+                    line-height: 0.9;
+                    margin-bottom: 12px;
+                }
+
+                .hero p {
+                    color: #666;
+                    font-size: 16px;
+                }
+
+            .tools {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 10px;
+                margin: 24px 0;
+            }
+
+            .tool-btn {
+                padding: 18px 12px;
+                border: 1px solid #e5e5e5;
+                border-radius: 12px;
+                background: white;
+                cursor: pointer;
+                text-align: center;
+                transition: 0.15s;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+                .tool-btn.active {
+                    background: #111;
+                    color: white;
+                    border-color: #111;
+                }
+
+                .tool-btn:hover {
+                    border-color: #111;
+                }
+
+            .dropzone {
+                border: 1.5px dashed #ddd;
+                border-radius: 16px;
+                padding: 48px 20px;
+                text-align: center;
+                background: #fafafa;
+                cursor: pointer;
+                transition: 0.15s;
+                margin: 20px 0;
+            }
+
+                .dropzone:hover {
+                    background: #f5f5f5;
+                    border-color: #111;
+                }
+
+                .dropzone.dragover {
+                    background: #111;
+                    color: white;
+                    border-color: #111;
+                }
+
+            .preview-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+                margin: 20px 0;
+            }
+
+            .preview-box {
+                border: 1px solid #eee;
+                border-radius: 12px;
+                padding: 12px;
+                background: white;
+            }
+
+                .preview-box img {
+                    width: 100%;
+                    border-radius: 8px;
+                    max-height: 260px;
+                    object-fit: contain;
+                    background: #f9f9f9;
+                }
+
+            .meta {
+                font-size: 12px;
+                color: #666;
+                margin-top: 8px;
+            }
+
+            .slider-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 16px 0;
+            }
+
+            input[type=range] {
+                flex: 1;
+                accent-color: #111;
+            }
+
+            .btn-black {
+                width: 100%;
+                background: #111;
+                color: white;
+                border: none;
+                padding: 14px;
+                border-radius: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                font-size: 15px;
+                margin-top: 10px;
+            }
+
+                .btn-black:hover {
+                    background: #000;
+                }
+
+            .trust {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+                margin: 24px 0;
+                flex-wrap: wrap;
+            }
+
+                .trust span {
+                    font-size: 11px;
+                    background: #f5f5f5;
+                    padding: 6px 10px;
+                    border-radius: 20px;
+                }
+
+            .faq {
+                margin-top: 48px;
+                border-top: 1px solid #eee;
+                padding-top: 24px;
+                text-align: left;
+            }
+
+                .faq h3 {
+                    font-size: 16px;
+                    margin: 16px 0 6px;
+                }
+
+                .faq p {
+                    font-size: 14px;
+                    color: #555;
+                }
+
+            input[type=text], input[type=number] {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                width: 100px;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            footer {
+                text-align: center;
+                padding: 32px;
+                font-size: 12px;
+                color: #999;
+                border-top: 1px solid #eee;
+                margin-top: 40px;
+            }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">◐ SA Image Tools</div>
+        <div class="badge">100% Private</div>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Compress &<br />Convert images</h1>
+            <p>Free, fast, private — works in your browser. No upload.</p>
+        </div>
+
+        <div class="tools">
+            <button class="tool-btn active" onclick="setTool('compress')">🗜️ Compress<br /><small>to 200KB</small></button>
+            <button class="tool-btn" onclick="setTool('resize')">↔️ Resize</button>
+            <button class="tool-btn" onclick="setTool('pdf')">📄 Image to PDF</button>
+            <button class="tool-btn" onclick="setTool('format')">🔄 JPG ↔ PNG</button>
+        </div>
+
+        <div id="dropzone" class="dropzone" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size:32px; margin-bottom:8px;">↑</div>
+            <b>Drop image here or click to browse</b>
+            <div style="font-size:13px; color:#888; margin-top:4px;">JPG, PNG, WebP up to 20MB</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" multiple class="hidden" />
+
+        <div id="controls" class="hidden">
+            <div id="compressControls">
+                <div class="slider-row">
+                    <label style="font-size:13px;">Quality:</label>
+                    <input type="range" id="quality" min="10" max="90" value="70" oninput="compress()" />
+                    <span id="qVal" style="font-size:13px; min-width:32px;">70%</span>
+                </div>
+                <div class="slider-row">
+                    <label style="font-size:13px;">Target:</label>
+                    <button onclick="setTarget(200)" style="padding:6px 10px; border:1px solid #ddd; border-radius:6px; background:white; cursor:pointer;">200KB</button>
+                    <button onclick="setTarget(100)" style="padding:6px 10px; border:1px solid #ddd; border-radius:6px; background:white; cursor:pointer;">100KB</button>
+                    <button onclick="setTarget(50)" style="padding:6px 10px; border:1px solid #ddd; border-radius:6px; background:white; cursor:pointer;">50KB</button>
+                </div>
+            </div>
+
+            <div id="resizeControls" class="hidden">
+                <div class="slider-row">
+                    <label>Width:</label><input type="number" id="rW" value="800" oninput="resize()" />
+                    <label>Height:</label><input type="number" id="rH" value="600" oninput="resize()" />
+                </div>
+            </div>
+
+            <div class="preview-grid">
+                <div class="preview-box">
+                    <div style="font-size:12px; font-weight:600; margin-bottom:8px;">Original</div>
+                    <img id="origImg" />
+                    <div id="origMeta" class="meta"></div>
+                </div>
+                <div class="preview-box">
+                    <div style="font-size:12px; font-weight:600; margin-bottom:8px;">Compressed</div>
+                    <img id="compImg" />
+                    <div id="compMeta" class="meta"></div>
+                </div>
+            </div>
+
+            <button id="downloadBtn" class="btn-black">Download</button>
+            <button id="pdfBtn" class="btn-black hidden" onclick="toPDF()">Download as PDF</button>
+        </div>
+
+        <div class="trust">
+            <span>🔒 No upload to server</span>
+            <span>✓ Free forever</span>
+            <span>○ No watermark</span>
+            <span>⚡ Works offline</span>
+        </div>
+
+        <div class="faq">
+            <h3>How to compress image to 200KB?</h3>
+            <p>Upload your JPG/PNG, drag quality slider to 60-70%, click Download. Perfect for NSFAS, job portals, university applications in South Africa that require images under 200KB.</p>
+            <h3>Is this image compressor free?</h3>
+            <p>Yes, 100% free, no login, no watermark. All compression happens in your browser - we never see your images.</p>
+            <h3>How to convert image to PDF?</h3>
+            <p>Switch to Image to PDF tool, upload 1-5 images, click Download as PDF. Ideal for combining ID documents into one PDF for job applications.</p>
+        </div>
+    </div>
+
+    <footer>© 2026 SA Image Tools - Free Image Compressor South Africa | <a href="/Privacy.html" style="color:#999;">Privacy</a> | <a href="/About.html" style="color:#999;">About</a> | <a href="/Contact.html" style="color:#999;">Contact</a></footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        let origFile, currentBlob, currentMode='compress', imgEl=new Image();
+        const fileInput=document.getElementById('fileInput'), dropzone=document.getElementById('dropzone');
+
+        function setTool(t){ currentMode=t; document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active')); event.target.closest('.tool-btn').classList.add('active');
+        document.getElementById('compressControls').classList.toggle('hidden', t!=='compress');
+        document.getElementById('resizeControls').classList.toggle('hidden', t!=='resize');
+        document.getElementById('pdfBtn').classList.toggle('hidden', t!=='pdf');
+        document.getElementById('downloadBtn').classList.toggle('hidden', t==='pdf');
+        if(origFile) process();
+        }
+        function setTarget(kb){ let q=70; if(kb<=50) q=30; else if(kb<=100) q=50; else q=70; document.getElementById('quality').value=q; document.getElementById('qVal').innerText=q+'%'; compress(); }
+
+        fileInput.onchange=e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); };
+        dropzone.ondragover=e=>{ e.preventDefault(); dropzone.classList.add('dragover'); };
+        dropzone.ondragleave=()=>dropzone.classList.remove('dragover');
+        dropzone.ondrop=e=>{ e.preventDefault(); dropzone.classList.remove('dragover'); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); };
+
+        function loadFile(f){ origFile=f; const r=new FileReader(); r.onload=ev=>{ imgEl.src=ev.target.result; imgEl.onload=()=>{ document.getElementById('origImg').src=ev.target.result; document.getElementById('origMeta').innerText=`${(f.size/1024).toFixed(1)} KB • ${imgEl.width}×${imgEl.height}`; document.getElementById('controls').classList.remove('hidden'); document.getElementById('rW').value=imgEl.width; document.getElementById('rH').value=imgEl.height; process(); }; }; r.readAsDataURL(f); }
+
+        function process(){ if(currentMode==='compress') compress(); else if(currentMode==='resize') resize(); else if(currentMode==='format') compress(); }
+
+        function compress(){
+        const q=document.getElementById('quality').value; document.getElementById('qVal').innerText=q+'%';
+        const canvas=document.createElement('canvas'); canvas.width=imgEl.width; canvas.height=imgEl.height;
+        const ctx=canvas.getContext('2d'); ctx.drawImage(imgEl,0,0);
+        canvas.toBlob(blob=>{
+        currentBlob=blob; const url=URL.createObjectURL(blob);
+        document.getElementById('compImg').src=url;
+        document.getElementById('compMeta').innerText=`${(blob.size/1024).toFixed(1)} KB • Saved ${Math.round(100-(blob.size/origFile.size*100))}%`;
+        document.getElementById('downloadBtn').onclick=()=>download(url, 'compressed.jpg');
+        }, 'image/jpeg', q/100);
+        }
+        function resize(){
+        const w=parseInt(document.getElementById('rW').value)||800, h=parseInt(document.getElementById('rH').value)||600;
+        const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d'); ctx.drawImage(imgEl,0,0,w,h);
+        canvas.toBlob(blob=>{
+        currentBlob=blob; const url=URL.createObjectURL(blob);
+        document.getElementById('compImg').src=url;
+        document.getElementById('compMeta').innerText=`${(blob.size/1024).toFixed(1)} KB • ${w}×${h}`;
+        document.getElementById('downloadBtn').onclick=()=>download(url, `resized-${w}x${h}.jpg`);
+        }, 'image/jpeg', 0.8);
+        }
+        function download(url, name){ const a=document.createElement('a'); a.href=url; a.download=name; a.click(); }
+        function toPDF(){
+        const { jsPDF } = window.jspdf; const doc=new jsPDF();
+        const canvas=document.createElement('canvas'); canvas.width=imgEl.width; canvas.height=imgEl.height;
+        canvas.getContext('2d').drawImage(imgEl,0,0);
+        const imgData=canvas.toDataURL('image/jpeg', 0.8);
+        const ratio=imgEl.width/imgEl.height; let w=180, h=w/ratio; if(h>250){ h=250; w=h*ratio; }
+        doc.addImage(imgData, 'JPEG', 15, 15, w, h); doc.save('image-to-pdf.pdf');
+        }
+    </script>
+</body>
+</html>
