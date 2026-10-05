@@ -244,16 +244,16 @@
         </div>
 
         <div class="tools">
-            <button class="tool-btn active" onclick="setTool('compress')">🗜️ Compress<br /><small>to 200KB</small></button>
-            <button class="tool-btn" onclick="setTool('resize')">↔️ Resize</button>
+            <button class="tool-btn active" onclick="setTool('compress')">🗜 Compress<br /><small>to 200KB</small></button>
+            <button class="tool-btn" onclick="setTool('resize')">↔ Resize</button>
             <button class="tool-btn" onclick="setTool('pdf')">📄 Image to PDF</button>
             <button class="tool-btn" onclick="setTool('format')">🔄 JPG ↔ PNG</button>
         </div>
 
         <div id="dropzone" class="dropzone" onclick="document.getElementById('fileInput').click()">
             <div style="font-size:32px; margin-bottom:8px;">↑</div>
-            <b>Drop image here or click to browse</b>
-            <div style="font-size:13px; color:#888; margin-top:4px;">JPG, PNG, WebP up to 20MB</div>
+            <b id="dropText">Drop image here or click to browse</b>
+            <div id="dropSub" style="font-size:13px; color:#888; margin-top:4px;">JPG, PNG, WebP up to 20MB</div>
         </div>
         <input type="file" id="fileInput" accept="image/*" multiple class="hidden" />
 
@@ -279,7 +279,7 @@
                 </div>
             </div>
 
-            <div class="preview-grid">
+            <div class="preview-grid" id="previewGrid">
                 <div class="preview-box">
                     <div style="font-size:12px; font-weight:600; margin-bottom:8px;">Original</div>
                     <img id="origImg" />
@@ -292,8 +292,11 @@
                 </div>
             </div>
 
+            <div id="pdfList" class="hidden"></div>
+
             <button id="downloadBtn" class="btn-black">Download</button>
-            <button id="pdfBtn" class="btn-black hidden" onclick="toPDF()">Download as PDF</button>
+            <button id="pdfBtn" class="btn-black hidden" onclick="toPDF()">Download as PDF (1 file)</button>
+            <div id="pdfCount" style="text-align:center; font-size:13px; color:#666; margin-top:8px;" class="hidden"></div>
         </div>
 
         <div class="trust">
@@ -309,7 +312,7 @@
             <h3>Is this image compressor free?</h3>
             <p>Yes, 100% free, no login, no watermark. All compression happens in your browser - we never see your images.</p>
             <h3>How to convert image to PDF?</h3>
-            <p>Switch to Image to PDF tool, upload 1-5 images, click Download as PDF. Ideal for combining ID documents into one PDF for job applications.</p>
+            <p>Switch to Image to PDF tool, upload up to 5 images, click Download as PDF. Ideal for combining ID documents into one PDF for job applications.</p>
         </div>
     </div>
 
@@ -317,24 +320,99 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        let origFile, currentBlob, currentMode='compress', imgEl=new Image();
+        let origFile, origFiles=[], currentBlob, currentMode='compress', imgEl=new Image();
+        let pdfImages=[]; // array of dataURLs for PDF
         const fileInput=document.getElementById('fileInput'), dropzone=document.getElementById('dropzone');
 
-        function setTool(t){ currentMode=t; document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active')); event.target.closest('.tool-btn').classList.add('active');
+        function setTool(t){
+        currentMode=t;
+        document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+        event.target.closest('.tool-btn').classList.add('active');
         document.getElementById('compressControls').classList.toggle('hidden', t!=='compress');
         document.getElementById('resizeControls').classList.toggle('hidden', t!=='resize');
         document.getElementById('pdfBtn').classList.toggle('hidden', t!=='pdf');
         document.getElementById('downloadBtn').classList.toggle('hidden', t==='pdf');
+        document.getElementById('previewGrid').classList.toggle('hidden', t==='pdf');
+        document.getElementById('pdfList').classList.toggle('hidden', t!=='pdf');
+        document.getElementById('pdfCount').classList.toggle('hidden', t!=='pdf');
+
+        if(t==='pdf'){
+        document.getElementById('dropText').innerText='Drop up to 5 images here or click to browse';
+        document.getElementById('dropSub').innerText='Select multiple images - will merge into 1 PDF';
+        } else {
+        document.getElementById('dropText').innerText='Drop image here or click to browse';
+        document.getElementById('dropSub').innerText='JPG, PNG, WebP up to 20MB';
+        }
+
         if(origFile) process();
         }
         function setTarget(kb){ let q=70; if(kb<=50) q=30; else if(kb<=100) q=50; else q=70; document.getElementById('quality').value=q; document.getElementById('qVal').innerText=q+'%'; compress(); }
 
-        fileInput.onchange=e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); };
+        fileInput.onchange=e=>{
+        if(e.target.files.length>0){
+        if(currentMode==='pdf'){
+        loadPDFFiles(e.target.files);
+        } else {
+        loadFile(e.target.files[0]);
+        }
+        }
+        };
         dropzone.ondragover=e=>{ e.preventDefault(); dropzone.classList.add('dragover'); };
         dropzone.ondragleave=()=>dropzone.classList.remove('dragover');
-        dropzone.ondrop=e=>{ e.preventDefault(); dropzone.classList.remove('dragover'); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); };
+        dropzone.ondrop=e=>{
+        e.preventDefault(); dropzone.classList.remove('dragover');
+        if(e.dataTransfer.files.length>0){
+        if(currentMode==='pdf') loadPDFFiles(e.dataTransfer.files);
+        else loadFile(e.dataTransfer.files[0]);
+        }
+        };
 
-        function loadFile(f){ origFile=f; const r=new FileReader(); r.onload=ev=>{ imgEl.src=ev.target.result; imgEl.onload=()=>{ document.getElementById('origImg').src=ev.target.result; document.getElementById('origMeta').innerText=`${(f.size/1024).toFixed(1)} KB • ${imgEl.width}×${imgEl.height}`; document.getElementById('controls').classList.remove('hidden'); document.getElementById('rW').value=imgEl.width; document.getElementById('rH').value=imgEl.height; process(); }; }; r.readAsDataURL(f); }
+        function loadFile(f){
+        origFile=f;
+        origFiles=[f];
+        const r=new FileReader();
+        r.onload=ev=>{
+        imgEl.src=ev.target.result;
+        imgEl.onload=()=>{
+        document.getElementById('origImg').src=ev.target.result;
+        document.getElementById('origMeta').innerText=`${(f.size/1024).toFixed(1)} KB • ${imgEl.width}×${imgEl.height}`;
+        document.getElementById('controls').classList.remove('hidden');
+        document.getElementById('rW').value=imgEl.width;
+        document.getElementById('rH').value=imgEl.height;
+        process();
+        };
+        };
+        r.readAsDataURL(f);
+        }
+
+        function loadPDFFiles(files){
+        origFiles = Array.from(files).slice(0,5);
+        if(files.length>5) alert('Max 5 images - taking first 5');
+        pdfImages=[];
+        const listDiv=document.getElementById('pdfList');
+        listDiv.innerHTML='';
+        document.getElementById('controls').classList.remove('hidden');
+        document.getElementById('pdfCount').innerText = `${origFiles.length} images selected - will create ${origFiles.length} pages PDF`;
+
+        let loaded=0;
+        origFiles.forEach((f,i)=>{
+        const r=new FileReader();
+        r.onload=ev=>{
+        pdfImages[i]=ev.target.result;
+        loaded++;
+        const img=document.createElement('img');
+        img.src=ev.target.result;
+        img.style.cssText='width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #eee; margin:4px;';
+        listDiv.appendChild(img);
+        if(loaded===origFiles.length){
+        // show first as preview
+        document.getElementById('origImg').src=pdfImages[0];
+        }
+        };
+        r.readAsDataURL(f);
+        });
+        origFile=origFiles[0];
+        }
 
         function process(){ if(currentMode==='compress') compress(); else if(currentMode==='resize') resize(); else if(currentMode==='format') compress(); }
 
@@ -361,13 +439,31 @@
         }, 'image/jpeg', 0.8);
         }
         function download(url, name){ const a=document.createElement('a'); a.href=url; a.download=name; a.click(); }
-        function toPDF(){
-        const { jsPDF } = window.jspdf; const doc=new jsPDF();
-        const canvas=document.createElement('canvas'); canvas.width=imgEl.width; canvas.height=imgEl.height;
-        canvas.getContext('2d').drawImage(imgEl,0,0);
-        const imgData=canvas.toDataURL('image/jpeg', 0.8);
-        const ratio=imgEl.width/imgEl.height; let w=180, h=w/ratio; if(h>250){ h=250; w=h*ratio; }
-        doc.addImage(imgData, 'JPEG', 15, 15, w, h); doc.save('image-to-pdf.pdf');
+
+        async function toPDF(){
+        if(pdfImages.length===0 && origFiles.length===0){
+        alert('Please select images first');
+        return;
+        }
+        const { jsPDF } = window.jspdf;
+        const doc=new jsPDF();
+
+        // Use pdfImages array if available, otherwise use single image
+        const imagesToUse = pdfImages.length>0? pdfImages : [imgEl.src];
+
+        for(let i=0; i<imagesToUse.length; i++){
+        if(i>0) doc.addPage();
+        const imgData = imagesToUse[i];
+        // Get dimensions
+        const img = new Image();
+        img.src = imgData;
+        await new Promise(res=>{ if(img.complete) res(); else img.onload=res; });
+
+        let w=180, h=w * (img.height/img.width);
+        if(h>270){ h=270; w=h * (img.width/img.height); }
+        doc.addImage(imgData, 'JPEG', (210-w)/2, 10, w, h);
+        }
+        doc.save(`SA-ImageTools-${imagesToUse.length}-images.pdf`);
         }
     </script>
 </body>
